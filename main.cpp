@@ -9,12 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 
-struct NeverComeException {};
-struct UnexpectedEoFException {};
-struct UnexpectedCharException {
-  char c;
-  UnexpectedCharException(char _c) : c{_c} {}
-};
+#include "exceptions.hpp"
 
 struct SExp;
 struct Pair;
