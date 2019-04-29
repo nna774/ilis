@@ -1,1 +1,5 @@
+ilis
+
 a.out
+*.o
+*.d
