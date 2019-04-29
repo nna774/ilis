@@ -60,3 +60,14 @@ struct cast_<Tag::Symbol> {
 
 template<enum Tag t>
 cast_<t> cast = cast_<t>();
+
+SExp make_Symbol(char const* str);
+
+SExp make_Integer(int n);
+
+extern SExp const nil;
+
+SExp cons(SExp car, SExp cdr);
+
+SExp car(SExp sexp);
+SExp cdr(SExp sexp);
