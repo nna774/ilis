@@ -2,7 +2,7 @@ TARGET := ilis
 all: $(TARGET)
 
 CXXFLAGS := -Wall -Wextra --std=c++17
-SRCS := main.cpp sexp.cpp
+SRCS := main.cpp sexp.cpp parse.cpp
 
 OBJS := $(SRCS:%.cpp=%.o)
 DEPS := $(SRCS:%.cpp=%.d)
