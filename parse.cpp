@@ -168,9 +168,11 @@ std::string show(SExp sexp) {
   return ss.str();
 }
 
-void show(std::vector<SExp> const& sexps) {
+std::string show(std::vector<SExp> const& sexps) {
+  std::stringstream ss;
   for(auto sexp: sexps) {
-    std::cout << show(sexp) << std::endl;
+    ss << show(sexp) << std::endl;
   }
+  return ss.str();
 }
 

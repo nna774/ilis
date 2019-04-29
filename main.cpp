@@ -5,5 +5,5 @@
 
 int main(int, char**) {
   auto sexps = parse(std::cin);
-  show(sexps);
+  std::cout << show(sexps);
 }
