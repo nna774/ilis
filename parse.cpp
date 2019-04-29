@@ -1,15 +1,9 @@
 #include "parse.hpp"
 
-#include <algorithm>
 #include <sstream>
-#include <experimental/array>
 
 #include "exceptions.hpp"
-
-template<size_t N>
-bool in(char c, std::array<char, N> chars) {
-  return std::any_of(begin(chars), end(chars), [c](char _) { return c == _; });
-}
+#include "utils.hpp"
 
 bool number_char(char c) {
   return ('0' <= c && c <= '9');
