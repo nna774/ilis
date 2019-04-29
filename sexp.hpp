@@ -33,11 +33,9 @@ struct Pair {
 };
 
 bool atomp(SExp sexp);
-
 bool integerp(SExp sexp);
-
 bool symbolp(SExp sexp);
-
+bool lambdap(SExp sexp);
 bool null(SExp sexp);
 
 template<enum Tag t>

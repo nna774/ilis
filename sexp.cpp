@@ -15,6 +15,10 @@ bool symbolp(SExp sexp) {
   return sexp._tag == Tag::Symbol;
 }
 
+bool lambdap(SExp sexp) {
+  return sexp._tag == Tag::Lambda;
+}
+
 bool null(SExp sexp) {
   return sexp._tag == Tag::Nil;
 }
