@@ -1,3 +1,5 @@
+#pragma once
+
 struct NeverComeException {};
 struct UnexpectedEoFException {};
 struct UnexpectedCharException {
