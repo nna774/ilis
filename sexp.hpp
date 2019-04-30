@@ -1,5 +1,7 @@
 #pragma once
 
+#include "env.hpp"
+
 #include <cassert>
 
 struct SExp;

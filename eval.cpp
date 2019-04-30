@@ -29,7 +29,6 @@ public:
   }
 };
 
-using Env = Env_*;
 Env const default_env = new Env_{};
 
 Env expand_env(Env env) {
