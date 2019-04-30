@@ -170,3 +170,21 @@ std::string show(std::vector<SExp> const& sexps) {
   return ss.str();
 }
 
+std::string show(Tag tag) {
+  switch(tag) {
+  case Tag::Pair:
+    return "Pair";
+  case Tag::Nil:
+    return "Nil";
+  case Tag::String:
+    return "String";
+  case Tag::Integer:
+    return "Integer";
+  case Tag::Symbol:
+    return "Symbol";
+  case Tag::Lambda:
+    return "Lambda";
+  default:
+    raise(NeverComeException);
+  }
+}
