@@ -101,6 +101,12 @@ std::pair<Env, SExp> eval_define(Env env, SExp sexp) {
   return std::make_pair(new_env, sym);
 }
 
+std::pair<Env, SExp> eval_lambda(Env env, SExp sexp) {
+  auto args = car(sexp);
+  auto body = cdr(sexp);
+  return std::make_pair(env, make_Lambda(env, args, body));
+}
+
 std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
   if(form == "if") {
     return eval_if(env, sexp); 
@@ -108,10 +114,47 @@ std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
   if(form == "define") {
     return eval_define(env, sexp);
   }
+  if(form == "lambda") {
+    return eval_lambda(env, sexp);
+  }
   if(form == "quote") {
     return std::make_pair(env, sexp);
   }
   raise(NeverComeException);
+}
+
+Env push_symbols(Env env, SExp dummies, SExp actuals) {
+  if(null(dummies)) {
+    if(!null(actuals)) {
+      raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals));
+    }
+    return env;
+  }
+  auto dummy = car(dummies);
+  auto actual = car(actuals);
+  if(null(actual)) {
+    raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals));
+  }
+  if(!symbolp(dummy)) {
+    raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals));
+  }
+  insert(env, cast<Tag::Symbol>(dummy), actual);
+  return push_symbols(env, cdr(dummies), cdr(actuals));
+}
+
+std::pair<Env, SExp> application(Env env_, SExp lambda, SExp args_) {
+  auto a = eval_list(env_, args_);
+  auto outer_env = a.first;
+  auto apply_args = a.second;
+  Env lambda_env = expand_env(env(lambda));
+  lambda_env = push_symbols(lambda_env, args(lambda), apply_args);
+  auto body_ = body(lambda);
+  auto ret = nil;
+  while(!null(body_)) {
+    std::tie(lambda_env, ret) = eval(lambda_env, car(body_));
+    body_ = cdr(body_);
+  }
+  return std::make_pair(outer_env, ret);
 }
 
 std::pair<Env, SExp> eval(Env env, SExp sexp) {
@@ -120,7 +163,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
   auto car_ = car(sexp);
   auto cdr_ = cdr(sexp);
   if(!atomp(car_)) {
-    car_ = eval(car_);
+    std::tie(env, car_) = eval(env, car_);
   }
   if(!(symbolp(car_) || lambdap(car_))) {
     raise_with_str(InvalidApplicationException, show(car_));
@@ -134,6 +177,9 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
   auto specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
   if(symbolp(car_) && in(std::string{cast<Tag::Symbol>(car_)}, specialforms)) {
     return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
+  }
+  if(lambdap(car_)) {
+    return application(env, car_, cdr_);
   }
 
   raise(NeverComeException);

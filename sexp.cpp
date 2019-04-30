@@ -62,6 +62,15 @@ SExp make_Nil() {
 
 SExp const nil = make_Nil();
 
+SExp make_Lambda(Env env, SExp args, SExp body) {
+  Value v;
+  v.lambda = new Lambda{env, args, body}; // leak
+  return SExp {
+    Tag::Lambda,
+    v,
+  };
+}
+
 SExp cons(SExp car, SExp cdr) {
   Value v;
   v.pair = new Pair{ car, cdr }; // will leak
@@ -78,4 +87,17 @@ SExp car(SExp sexp) {
 SExp cdr(SExp sexp) {
   assert(sexp._tag == Tag::Pair);
   return sexp._value.pair->_cdr;
+}
+
+Env env(SExp lambda) {
+  assert(lambda._tag == Tag::Lambda);
+  return lambda._value.lambda->env;
+}
+SExp args(SExp lambda) {
+  assert(lambda._tag == Tag::Lambda);
+  return lambda._value.lambda->args;
+}
+SExp body(SExp lambda) {
+  assert(lambda._tag == Tag::Lambda);
+  return lambda._value.lambda->body;
 }

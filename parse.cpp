@@ -157,6 +157,8 @@ std::string show(SExp sexp) {
     ss << "'()";
   } else if(symbolp(sexp)) {
     ss << std::string{cast<Tag::Symbol>(sexp)};
+  } else if(lambdap(sexp)) {
+    ss << "(lambda " << show_list(args(sexp)) << ' ' << show_list(body(sexp)) << ')';
   } else {
   }
   return ss.str();
