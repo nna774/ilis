@@ -38,6 +38,8 @@ bool symbolp(SExp sexp);
 bool lambdap(SExp sexp);
 bool null(SExp sexp);
 
+Tag type(SExp);
+
 template<enum Tag t>
 struct cast_{};
 

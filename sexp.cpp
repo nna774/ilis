@@ -23,6 +23,10 @@ bool null(SExp sexp) {
   return sexp._tag == Tag::Nil;
 }
 
+Tag type(SExp sexp) {
+  return sexp._tag;
+}
+
 char* copy_str(char const* str) {
   // 現代のコードではない。あとでGCを書く。
   size_t len = std::strlen(str);
