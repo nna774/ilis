@@ -68,7 +68,7 @@ SExp parse_List(std::istream& is) {
   char c;
   is.get(c);
   if(c != '(') {
-    throw UnexpectedCharException{c};
+    raise_with_char(UnexpectedCharException, c);
   }
 
   int c_;
@@ -90,7 +90,7 @@ SExp parse_List(std::istream& is) {
 SExp parse_SExpr(std::istream& is) {
   int c_ = is.peek();
   if(c_ == EOF) {
-    throw UnexpectedEoFException{};
+    raise(UnexpectedEoFException);
   }
   char c;
   is.get(c);
@@ -113,7 +113,7 @@ SExp parse_SExpr(std::istream& is) {
     } else if(identifier_char(c)) {
       return parse_Symbol(is);
     } else {
-      throw NeverComeException{};
+      raise(NeverComeException);
     }
   }
   }

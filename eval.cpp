@@ -22,7 +22,7 @@ public:
     if(parent != nullptr) {
       return parent->lookup(sym);
     }
-    throw UnboundVariableException{sym};
+    raise_with_str(UnboundVariableException, sym);
   }
   void insert(std::string const& sym, SExp sexp) {
     map.insert(std::make_pair(sym, sexp));
@@ -58,7 +58,7 @@ SExp eval_cons(SExp sexp) {
   auto cadr = car(cdr(sexp));
   auto cddr = cdr(cdr(sexp));
   if(!null(cddr)) {
-    throw ConsInvalidApplicationException{show(sexp)};
+    raise_with_str(ConsInvalidApplicationException, show(sexp));
   }
   return cons(car_, cadr);
 }
@@ -68,7 +68,7 @@ SExp eval_primitive(std::string prim, SExp sexp) {
     return eval_cons(sexp);
   }
 
-  throw NeverComeException{};
+  raise(NeverComeException);
 }
 
 std::pair<Env, SExp> eval_if(Env env, SExp sexp) {
@@ -77,7 +77,7 @@ std::pair<Env, SExp> eval_if(Env env, SExp sexp) {
   auto false_branch = car(cdr(cdr(sexp)));
   auto cdddr = cdr(cdr(cdr(sexp)));
   if(!null(cdddr)) {
-    throw IfInvalidApplicationException{show(sexp)};
+    raise_with_str(IfInvalidApplicationException, show(sexp));
   }
   auto cond_ = eval(env, cond);
   env = cond_.first;
@@ -94,7 +94,7 @@ std::pair<Env, SExp> eval_define(Env env, SExp sexp) {
   auto cddr = cdr(cdr(sexp));
   assert(symbolp(sym));
   if(!null(cddr)) {
-    throw DefineInvalidApplicationException{show(sexp)};
+    raise_with_str(DefineInvalidApplicationException, show(sexp));
   }
   auto v = eval(env, val);
   Env new_env = expand_env(env);
@@ -112,7 +112,7 @@ std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
   if(form == "quote") {
     return std::make_pair(env, sexp);
   }
-  throw NeverComeException{};
+  raise(NeverComeException);
 }
 
 std::pair<Env, SExp> eval(Env env, SExp sexp) {
@@ -124,7 +124,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     car_ = eval(car_);
   }
   if(!(symbolp(car_) || lambdap(car_))) {
-    throw InvalidApplicationException{show(car_)};
+    raise_with_str(InvalidApplicationException, show(car_));
   }
   auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq");
   if(symbolp(car_) && in(std::string{cast<Tag::Symbol>(car_)}, primitives)) {
@@ -137,7 +137,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
   }
 
-  throw NeverComeException{};
+  raise(NeverComeException);
 }
 
 SExp eval(SExp sexp) {
