@@ -37,6 +37,12 @@ SExp eval_cdr(SExp sexp) {
 SExp eval_atom(SExp sexp) {
   return atomp(car(sexp)) ? TRUE : FALSE;
 }
+SExp eval_eq(SExp sexp) {
+  auto car_ = car(sexp);
+  auto cdr_ = cdr(sexp);
+  auto cadr = car(cdr_);
+  return eq(car_, cadr);
+}
 
 [[noreturn]] void fail(SExp sexp) {
   std::cerr << "*** fail *** " << show(sexp) << std::endl;
@@ -55,6 +61,9 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   }
   if(prim == "atom") {
     return eval_atom(sexp);
+  }
+  if(prim == "eq") {
+    return eval_eq(sexp);
   }
   if(prim == "fail") {
     fail(sexp);
