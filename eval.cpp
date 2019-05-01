@@ -124,19 +124,20 @@ std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
 }
 
 Env push_symbols(Env env, SExp dummies, SExp actuals) {
+  auto invalid = [&](){ raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals)); };
   if(null(dummies)) {
     if(!null(actuals)) {
-      raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals));
+      invalid();
     }
     return env;
   }
   auto dummy = car(dummies);
   auto actual = car(actuals);
   if(null(actual)) {
-    raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals));
+    invalid();
   }
   if(!symbolp(dummy)) {
-    raise_with_str(LambdaInvalidApplicationException, "dummies: " + show(dummies) + ", actuals: " + show(actuals));
+    invalid();
   }
   insert(env, cast<Tag::Symbol>(dummy), actual);
   return push_symbols(env, cdr(dummies), cdr(actuals));
