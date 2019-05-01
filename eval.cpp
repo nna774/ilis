@@ -55,12 +55,14 @@ std::pair<Env, SExp> eval_list(Env env, SExp sexp) {
 }
 
 SExp eval_cons(SExp sexp) {
+  auto invalid = [&](){ raise_with_str(ConsInvalidApplicationException, show(sexp)); };
+  if(null(sexp)) invalid();
   auto car_ = car(sexp);
-  auto cadr = car(cdr(sexp));
-  auto cddr = cdr(cdr(sexp));
-  if(!null(cddr)) {
-    raise_with_str(ConsInvalidApplicationException, show(sexp));
-  }
+  auto cdr_ = cdr(sexp);
+  if(null(cdr_)) invalid();
+  auto cadr = car(cdr_);
+  auto cddr = cdr(cdr_);
+  if(!null(cddr)) invalid();
   return cons(car_, cadr);
 }
 
