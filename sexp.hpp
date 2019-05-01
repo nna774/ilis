@@ -31,6 +31,7 @@ struct SExp_ {
 };
 
 SExp eq(SExp lhs, SExp rhs);
+bool to_bool(SExp);
 
 struct Pair {
   SExp _car;

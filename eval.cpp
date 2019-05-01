@@ -80,9 +80,8 @@ std::pair<Env, SExp> eval_if(Env env, SExp sexp) {
   if(!null(cdddr)) {
     raise_with_str(IfInvalidApplicationException, show(sexp));
   }
-  auto cond_ = eval(env, cond);
-  env = cond_.first;
-  if(null(cond_.second)) {
+  std::tie(env, cond) = eval(env, cond);
+  if(to_bool(eq(cond, FALSE))) {
     return eval(env, false_branch);
   } else {
     return eval(env, true_branch);

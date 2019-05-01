@@ -34,6 +34,11 @@ Tag type(SExp sexp) {
   return sexp->_tag;
 }
 
+bool to_bool(SExp sexp) {
+  if(sexp->_tag != Tag::Symbol) return true;
+  return std::strcmp(sexp->_value.symbol, "#f");
+}
+
 SExp const nil = new SExp_{};
 SExp const TRUE = make_Symbol("#t");
 SExp const FALSE = make_Symbol("#f");
