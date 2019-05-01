@@ -10,7 +10,7 @@ bool number_char(char c) {
 }
 
 bool identifier_char(char c) {
-  auto chars = std::experimental::make_array('-', '+', '?');
+  auto chars = std::experimental::make_array('-', '+', '?', '#');
   return ('a' <= c && c <= 'z')
       || ('A' <= c && c <= 'Z')
       || number_char(c)

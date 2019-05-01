@@ -12,6 +12,8 @@ class Env_ {
   Env_ const* parent;
 public:
   Env_() : parent{nullptr} {
+    map["#t"] = make_Symbol("#t");
+    map["#f"] = make_Symbol("#f");
   }
   Env_(Env_ const* p) : map{}, parent{p} {}
   SExp lookup(std::string const& sym) const {
