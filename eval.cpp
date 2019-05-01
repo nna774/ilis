@@ -62,9 +62,22 @@ SExp eval_cons(SExp sexp) {
   return cons(car_, cadr);
 }
 
+SExp eval_car(SExp sexp) {
+  return car(car(sexp));
+}
+SExp eval_cdr(SExp sexp) {
+  return cdr(car(sexp));
+}
+
 SExp eval_primitive(std::string prim, SExp sexp) {
   if(prim == "cons") {
     return eval_cons(sexp);
+  }
+  if(prim == "car") {
+    return eval_car(sexp);
+  }
+  if(prim == "cdr") {
+    return eval_cdr(sexp);
   }
 
   raise(NeverComeException);
