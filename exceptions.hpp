@@ -40,15 +40,15 @@ struct UnboundVariableException : public Exception {
 };
 
 template<typename T>
-void raise_(std::string_view file, int line) {
+[[noreturn]] void raise_(std::string_view file, int line) {
   throw T{file, line};
 }
 template<typename T>
-void raise_(std::string_view file, int line, char c) {
+[[noreturn]] void raise_(std::string_view file, int line, char c) {
   throw T{file, line, c};
 }
 template<typename T>
-void raise_(std::string_view file, int line, std::string_view str) {
+[[noreturn]] void raise_(std::string_view file, int line, std::string_view str) {
   throw T{file, line, str};
 }
 
