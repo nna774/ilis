@@ -168,15 +168,17 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
   if(!(symbolp(car_) || lambdap(car_))) {
     raise_with_str(InvalidApplicationException, show(car_));
   }
-  auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq");
-  if(symbolp(car_) && in(std::string{cast<Tag::Symbol>(car_)}, primitives)) {
-    auto l = eval_list(env, cdr_);
-    // eval_list で評価は終了しているので、その後envは変化しない。
-    return std::make_pair(l.first, eval_primitive(cast<Tag::Symbol>(car_), l.second));
-  }
-  auto specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
-  if(symbolp(car_) && in(std::string{cast<Tag::Symbol>(car_)}, specialforms)) {
-    return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
+  if(symbolp(car_)) {
+    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq");
+    if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
+      auto l = eval_list(env, cdr_);
+      // eval_list で評価は終了しているので、その後envは変化しない。
+      return std::make_pair(l.first, eval_primitive(cast<Tag::Symbol>(car_), l.second));
+    }
+    auto specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
+    if(in<std::string>(cast<Tag::Symbol>(car_), specialforms)) {
+      return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
+    }
   }
   if(lambdap(car_)) {
     return application(env, car_, cdr_);
