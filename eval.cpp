@@ -70,6 +70,9 @@ SExp eval_car(SExp sexp) {
 SExp eval_cdr(SExp sexp) {
   return cdr(car(sexp));
 }
+SExp eval_atom(SExp sexp) {
+  return atomp(car(sexp)) ? TRUE : FALSE;
+}
 
 SExp eval_primitive(std::string prim, SExp sexp) {
   if(prim == "cons") {
@@ -80,6 +83,9 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   }
   if(prim == "cdr") {
     return eval_cdr(sexp);
+  }
+  if(prim == "atom") {
+    return eval_atom(sexp);
   }
 
   raise(NeverComeException);
