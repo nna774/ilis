@@ -39,6 +39,10 @@ struct UnboundVariableException : public Exception {
   UnboundVariableException(std::string_view f, int l, std::string_view str_) : Exception{f, l}, str{str_} {}
 };
 
+struct FailException : public Exception {
+  using Exception::Exception;
+};
+
 template<typename T>
 [[noreturn]] void raise_(std::string_view file, int line) {
   throw T{file, line};

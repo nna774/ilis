@@ -3,6 +3,7 @@
 #include "exceptions.hpp"
 #include "parse.hpp"
 
+#include <iostream>
 #include <utility>
 #include <tuple>
 #include <map>
@@ -76,6 +77,11 @@ SExp eval_atom(SExp sexp) {
   return atomp(car(sexp)) ? TRUE : FALSE;
 }
 
+[[noreturn]] void fail(SExp sexp) {
+  std::cerr << "*** fail *** " << show(sexp) << std::endl;
+  raise(FailException);
+}
+
 SExp eval_primitive(std::string prim, SExp sexp) {
   if(prim == "cons") {
     return eval_cons(sexp);
@@ -88,6 +94,9 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   }
   if(prim == "atom") {
     return eval_atom(sexp);
+  }
+  if(prim == "fail") {
+    fail(sexp);
   }
 
   raise(NeverComeException);
@@ -193,7 +202,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     raise_with_str(InvalidApplicationException, show(car_));
   }
   if(symbolp(car_)) {
-    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq");
+    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail");
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
       auto l = eval_list(env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
