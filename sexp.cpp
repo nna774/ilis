@@ -53,14 +53,7 @@ SExp make_Integer(int n) {
   };
 }
 
-SExp make_Nil() {
-  return SExp {
-    Tag::Nil,
-    Value{},
-  };
-}
-
-SExp const nil = make_Nil();
+SExp const nil{};
 
 SExp make_Lambda(Env env, SExp args, SExp body) {
   Value v;

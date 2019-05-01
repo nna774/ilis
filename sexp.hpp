@@ -27,7 +27,8 @@ union Value {
 struct SExp {
   Tag _tag;
   Value _value;
-  SExp(Tag t, Value v) : _tag(t), _value(v) {}
+  SExp() : _tag{Tag::Nil}, _value{} {}
+  SExp(Tag t, Value v) : _tag{t}, _value{v} {}
 };
 
 struct Pair {
