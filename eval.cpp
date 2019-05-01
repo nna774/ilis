@@ -179,6 +179,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     if(in<std::string>(cast<Tag::Symbol>(car_), specialforms)) {
       return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
     }
+    std::tie(env, car_) = eval(env, car_);
   }
   if(lambdap(car_)) {
     return application(env, car_, cdr_);
