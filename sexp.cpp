@@ -54,6 +54,8 @@ SExp make_Integer(int n) {
 }
 
 SExp const nil{};
+SExp const TRUE = make_Symbol("#t");
+SExp const FALSE = make_Symbol("#f");
 
 SExp make_Lambda(Env env, SExp args, SExp body) {
   Value v;

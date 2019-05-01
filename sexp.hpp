@@ -84,6 +84,8 @@ SExp make_Integer(int n);
 SExp make_Lambda(Env, SExp args, SExp body);
 
 extern SExp const nil;
+extern SExp const TRUE;
+extern SExp const FALSE;
 
 SExp cons(SExp car, SExp cdr);
 
