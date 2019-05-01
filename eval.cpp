@@ -229,3 +229,13 @@ SExp eval(std::vector<SExp> sexps) {
   auto r = eval(default_env, sexps);
   return r.second;
 }
+
+[[noreturn]] void repl(std::istream& is) {
+  auto env = default_env;
+  while(true) {
+    auto sexp = parse_SExpr(is);
+    std::tie(env, sexp) = eval(env, sexp);
+    std::cout << "#=> " << show(sexp) << std::endl;
+    skip_spaces(is);
+  }
+}
