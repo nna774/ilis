@@ -30,6 +30,8 @@ struct SExp_ {
   SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
 };
 
+SExp eq(SExp lhs, SExp rhs);
+
 struct Pair {
   SExp _car;
   SExp _cdr;

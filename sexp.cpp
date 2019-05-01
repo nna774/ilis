@@ -3,6 +3,12 @@
 #include <cstdlib>
 #include <cstring>
 
+SExp eq(SExp lhs, SExp rhs) {
+  if(lhs->_tag != rhs->_tag) return FALSE;
+  if(lhs->_tag == Tag::Integer) return lhs->_value.integer == rhs->_value.integer ? TRUE : FALSE;
+  return lhs == rhs ? TRUE : FALSE;
+}
+
 bool atomp(SExp sexp) {
   return sexp->_tag != Tag::Pair;
 }
