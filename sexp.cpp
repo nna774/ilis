@@ -4,28 +4,32 @@
 #include <cstring>
 
 bool atomp(SExp sexp) {
-  return sexp._tag != Tag::Pair;
+  return sexp->_tag != Tag::Pair;
 }
 
 bool integerp(SExp sexp) {
-  return sexp._tag == Tag::Integer;
+  return sexp->_tag == Tag::Integer;
 }
 
 bool symbolp(SExp sexp) {
-  return sexp._tag == Tag::Symbol;
+  return sexp->_tag == Tag::Symbol;
 }
 
 bool lambdap(SExp sexp) {
-  return sexp._tag == Tag::Lambda;
+  return sexp->_tag == Tag::Lambda;
 }
 
 bool null(SExp sexp) {
-  return sexp._tag == Tag::Nil;
+  return sexp->_tag == Tag::Nil;
 }
 
 Tag type(SExp sexp) {
-  return sexp._tag;
+  return sexp->_tag;
 }
+
+SExp const nil = new SExp_{};
+SExp const TRUE = make_Symbol("#t");
+SExp const FALSE = make_Symbol("#f");
 
 char* copy_str(char const* str) {
   // 現代のコードではない。あとでGCを書く。
@@ -38,7 +42,7 @@ char* copy_str(char const* str) {
 SExp make_Symbol(char const* str) {
   Value v;
   v.symbol = copy_str(str); // leak
-  return SExp {
+  return new SExp_ {
     Tag::Symbol,
     v,
   };
@@ -47,20 +51,16 @@ SExp make_Symbol(char const* str) {
 SExp make_Integer(int n) {
   Value v;
   v.integer = n;
-  return SExp {
+  return new SExp_ {
     Tag::Integer,
     v,
   };
 }
 
-SExp const nil{};
-SExp const TRUE = make_Symbol("#t");
-SExp const FALSE = make_Symbol("#f");
-
 SExp make_Lambda(Env env, SExp args, SExp body) {
   Value v;
   v.lambda = new Lambda{env, args, body}; // leak
-  return SExp {
+  return new SExp_ {
     Tag::Lambda,
     v,
   };
@@ -69,30 +69,30 @@ SExp make_Lambda(Env env, SExp args, SExp body) {
 SExp cons(SExp car, SExp cdr) {
   Value v;
   v.pair = new Pair{ car, cdr }; // will leak
-  return SExp {
+  return new SExp_ {
     Tag::Pair,
     v,
   };
 }
 
 SExp car(SExp sexp) {
-  assert(sexp._tag == Tag::Pair);
-  return sexp._value.pair->_car;
+  assert(sexp->_tag == Tag::Pair);
+  return sexp->_value.pair->_car;
 }
 SExp cdr(SExp sexp) {
-  assert(sexp._tag == Tag::Pair);
-  return sexp._value.pair->_cdr;
+  assert(sexp->_tag == Tag::Pair);
+  return sexp->_value.pair->_cdr;
 }
 
 Env env(SExp lambda) {
-  assert(lambda._tag == Tag::Lambda);
-  return lambda._value.lambda->env;
+  assert(lambda->_tag == Tag::Lambda);
+  return lambda->_value.lambda->env;
 }
 SExp args(SExp lambda) {
-  assert(lambda._tag == Tag::Lambda);
-  return lambda._value.lambda->args;
+  assert(lambda->_tag == Tag::Lambda);
+  return lambda->_value.lambda->args;
 }
 SExp body(SExp lambda) {
-  assert(lambda._tag == Tag::Lambda);
-  return lambda._value.lambda->body;
+  assert(lambda->_tag == Tag::Lambda);
+  return lambda->_value.lambda->body;
 }

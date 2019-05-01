@@ -4,7 +4,6 @@
 
 #include <cassert>
 
-struct SExp;
 struct Pair;
 struct Lambda;
 
@@ -24,11 +23,11 @@ union Value {
   Lambda* lambda;
 };
 
-struct SExp {
+struct SExp_ {
   Tag _tag;
   Value _value;
-  SExp() : _tag{Tag::Nil}, _value{} {}
-  SExp(Tag t, Value v) : _tag{t}, _value{v} {}
+  SExp_() : _tag{Tag::Nil}, _value{} {}
+  SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
 };
 
 struct Pair {
@@ -57,22 +56,22 @@ struct cast_{};
 template<>
 struct cast_<Tag::Integer> {
   int operator()(SExp const& sexp) {
-    assert(sexp._tag == Tag::Integer);
-    return sexp._value.integer;
+    assert(sexp->_tag == Tag::Integer);
+    return sexp->_value.integer;
   }
 };
 template<>
 struct cast_<Tag::Symbol> {
   char const* operator()(SExp const& sexp) {
-    assert(sexp._tag == Tag::Symbol);
-    return sexp._value.symbol;
+    assert(sexp->_tag == Tag::Symbol);
+    return sexp->_value.symbol;
   }
 };
 template<>
 struct cast_<Tag::Lambda> {
   Lambda const* operator()(SExp const& sexp) {
-    assert(sexp._tag == Tag::Lambda);
-    return sexp._value.lambda;
+    assert(sexp->_tag == Tag::Lambda);
+    return sexp->_value.lambda;
   }
 };
 

@@ -2,8 +2,8 @@
 
 #include <string>
 
-struct SExp;
-
+class SExp_;
+using SExp = SExp_*;
 class Env_;
 using Env = Env_ *;
 
