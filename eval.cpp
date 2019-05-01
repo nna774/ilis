@@ -6,7 +6,6 @@
 #include <iostream>
 #include <tuple>
 
-std::pair<Env, SExp> eval(Env, SExp);
 
 std::pair<Env, SExp> eval_list(Env env, SExp sexp) {
   if(null(sexp)) return std::make_pair(env, nil);
@@ -186,7 +185,7 @@ SExp eval(SExp sexp) {
   return r.second;
 }
 
-std::pair<Env, SExp> eval(Env env, std::vector<SExp> sexps) {
+std::pair<Env, SExp> eval(Env env, std::vector<SExp> const& sexps) {
   auto ret{nil};
   for(auto sexp: sexps) {
     std::tie(env, ret) = eval(env, sexp);
@@ -194,7 +193,7 @@ std::pair<Env, SExp> eval(Env env, std::vector<SExp> sexps) {
   return std::make_pair(env, ret);
 }
 
-SExp eval(std::vector<SExp> sexps) {
+SExp eval(std::vector<SExp> const& sexps) {
   auto r = eval(default_env, sexps);
   return r.second;
 }
