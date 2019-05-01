@@ -2,10 +2,12 @@
 #include "utils.hpp"
 #include "exceptions.hpp"
 #include "parse.hpp"
+#include "prelude.hpp"
 
 #include <iostream>
 #include <tuple>
 
+Env const default_env = prelude();
 
 std::pair<Env, SExp> eval_list(Env env, SExp sexp) {
   if(null(sexp)) return std::make_pair(env, nil);
