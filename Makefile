@@ -26,5 +26,5 @@ clean:
 
 test: $(TARGET)
 	for f in $(TESTS); do \
-		./$(TARGET) < $$f; \
+		./$(TARGET) < $$f || exit -1; \
 	done
