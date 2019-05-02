@@ -17,3 +17,5 @@
     (if (eq (sign x) 1)
       (dec (neg (dec x)))
       (inc (neg (inc x)))))))
+
+(define not (lambda (x) (eq x #f)))
