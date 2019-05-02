@@ -18,18 +18,19 @@ enum class Tag {
 
 struct SExp_;
 
-struct SExp {
-  SExp_* sexp;
+class SExp {
+  SExp_* _sexp;
+public:
   SExp();
-  SExp(SExp_ * s) : sexp{s} {}
+  SExp(SExp_ * s) : _sexp{s} {}
   SExp_ const * operator->() const {
-    return sexp;
+    return _sexp;
   }
   SExp_* operator->() {
-    return sexp;
+    return _sexp;
   }
   bool operator==(SExp other) {
-    return sexp == other.sexp;
+    return _sexp == other._sexp;
   }
 };
 

@@ -29,7 +29,7 @@ struct Lambda {
 };
 
 SExp::SExp() {
-  sexp = new SExp_{};
+  _sexp = new SExp_{};
 }
 
 int cast_<Tag::Integer>::operator()(SExp const& sexp) {
