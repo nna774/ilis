@@ -2,8 +2,7 @@
 
 #include <string>
 
-class SExp_;
-using SExp = SExp_*;
+class SExp;
 class Env_;
 using Env = Env_ *;
 

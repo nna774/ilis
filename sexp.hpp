@@ -16,6 +16,50 @@ enum class Tag {
   Lambda,
 };
 
+union Value {
+  Pair* pair;
+  char const* symbol;
+  int integer;
+  Lambda* lambda;
+};
+
+struct SExp_ {
+  Tag _tag;
+  Value _value;
+  SExp_() : _tag{Tag::Nil}, _value{} {}
+  SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
+};
+
+struct SExp {
+  SExp_* sexp;
+  SExp() : sexp{new SExp_{}} {}
+  SExp(SExp_ * s) : sexp{s} {}
+  SExp_ operator*() {
+    return *sexp;
+  }
+  SExp_ const * operator->() const {
+    return sexp;
+  }
+  SExp_* operator->() {
+    return sexp;
+  }
+  bool operator==(SExp other) {
+    return sexp == other.sexp;
+  }
+};
+
+struct Pair {
+  SExp _car;
+  SExp _cdr;
+  Pair(SExp car, SExp cdr) : _car{car}, _cdr{cdr} {}
+};
+
+struct Lambda {
+  Env env;
+  SExp args;
+  SExp body;
+};
+
 SExp eq(SExp lhs, SExp rhs);
 bool to_bool(SExp);
 
