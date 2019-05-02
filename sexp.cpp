@@ -10,6 +10,12 @@ struct SExp_ {
   SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
 };
 
+struct Pair {
+  SExp _car;
+  SExp _cdr;
+  Pair(SExp car, SExp cdr) : _car{car}, _cdr{cdr} {}
+};
+
 int cast_<Tag::Integer>::operator()(SExp const& sexp) {
   assert(sexp->_tag == Tag::Integer);
   return sexp->_value.integer;

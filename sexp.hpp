@@ -26,12 +26,6 @@ union Value {
 SExp eq(SExp lhs, SExp rhs);
 bool to_bool(SExp);
 
-struct Pair {
-  SExp _car;
-  SExp _cdr;
-  Pair(SExp car, SExp cdr) : _car{car}, _cdr{cdr} {}
-};
-
 struct Lambda {
   Env env;
   SExp args;
