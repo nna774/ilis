@@ -120,9 +120,8 @@ std::pair<Env, SExp> eval_define(Env env, SExp sexp) {
     raise_with_str(DefineInvalidApplicationException, show(sexp));
   }
   auto v = eval(env, val);
-  Env new_env = expand_env(env);
-  insert(new_env, cast<Tag::Symbol>(sym), v.second);
-  return std::make_pair(new_env, sym);
+  insert(env, cast<Tag::Symbol>(sym), v.second);
+  return std::make_pair(env, sym);
 }
 
 std::pair<Env, SExp> eval_lambda(Env env, SExp sexp) {
