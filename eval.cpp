@@ -196,13 +196,13 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     raise_with_str(InvalidApplicationException, show(car_));
   }
   if(symbolp(car_)) {
-    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
+    auto const primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
       auto l = eval_list(env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
       return std::make_pair(l.first, eval_primitive(cast<Tag::Symbol>(car_), l.second));
     }
-    auto specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
+    auto const specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
     if(in<std::string>(cast<Tag::Symbol>(car_), specialforms)) {
       return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
     }
