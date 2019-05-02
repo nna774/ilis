@@ -50,6 +50,14 @@ SExp eval_add(SExp sexp, int diff) {
   return make_Integer(cast<Tag::Integer>(sexp) + diff);
 }
 
+SExp eval_sign(SExp sexp) {
+  sexp = car(sexp);
+  assert(integerp(sexp));
+  int d = cast<Tag::Integer>(sexp);
+  int sign = d < 0 ? -1 : (d != 0);
+  return make_Integer(sign);
+}
+
 [[noreturn]] void fail(SExp sexp) {
   std::cerr << "*** fail *** " << show(sexp) << std::endl;
   raise(FailException);
@@ -76,6 +84,9 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   }
   if(prim == "dec") {
     return eval_add(sexp, -1);
+  }
+  if(prim == "sign") {
+    return eval_sign(sexp);
   }
   if(prim == "fail") {
     fail(sexp);
@@ -186,7 +197,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     raise_with_str(InvalidApplicationException, show(car_));
   }
   if(symbolp(car_)) {
-    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec");
+    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
       auto l = eval_list(env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
