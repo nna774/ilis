@@ -1,0 +1,4 @@
+(defmacro unless (cond true false) (if (not cond) true false))
+
+(unless #t (fail) '())
+(unless #f '() (fail))

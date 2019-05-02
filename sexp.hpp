@@ -14,6 +14,7 @@ enum class Tag {
   Integer,
   Symbol,
   Lambda,
+  Macro,
 };
 
 struct SExp_;
@@ -41,6 +42,7 @@ bool atomp(SExp sexp);
 bool integerp(SExp sexp);
 bool symbolp(SExp sexp);
 bool lambdap(SExp sexp);
+bool macrop(SExp sexp);
 bool null(SExp sexp);
 
 Tag type(SExp);
@@ -67,6 +69,7 @@ cast_<t> cast = cast_<t>{};
 SExp make_Symbol(char const* str);
 SExp make_Integer(int n);
 SExp make_Lambda(Env, SExp args, SExp body);
+SExp make_Macro(Env, SExp args, SExp body);
 
 extern SExp const nil;
 extern SExp const TRUE;
@@ -80,3 +83,5 @@ SExp cdr(SExp sexp);
 Env env(SExp lambda);
 SExp args(SExp lambda);
 SExp body(SExp lambda);
+SExp macro_args(SExp macro);
+SExp macro_body(SExp macro);

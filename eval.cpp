@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <cstring>
 
 Env const default_env = prelude();
 
@@ -130,6 +131,15 @@ std::pair<Env, SExp> eval_lambda(Env env, SExp sexp) {
   return std::make_pair(env, make_Lambda(env, args, body));
 }
 
+std::pair<Env, SExp> eval_macro(Env env, SExp sexp) {
+  auto sym = car(sexp);
+  assert(symbolp(sym));
+  auto args = car(cdr(sexp));
+  auto body = car(cdr(cdr(sexp)));
+  insert(env, cast<Tag::Symbol>(sym), make_Macro(env, args, body));
+  return std::make_pair(env, sym);
+}
+
 std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
   if(form == "if") {
     return eval_if(env, sexp); 
@@ -143,7 +153,59 @@ std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
   if(form == "quote") {
     return std::make_pair(env, sexp);
   }
+  if(form == "defmacro") {
+    return eval_macro(env, sexp);
+  }
   raise(NeverComeException);
+}
+
+SExp reverse_impl(SExp list, SExp result) {
+  if(null(list)) return result;
+  return reverse_impl(cdr(list), cons(car(list), result));
+}
+SExp reverse(SExp list) {
+  return reverse_impl(list, nil);
+}
+
+SExp copy_list_impl(SExp list, SExp result) {
+  if(null(list)) return result;
+  return copy_list_impl(cdr(list), cons(car(list), result));
+}
+SExp copy_list(SExp list) {
+  return reverse(copy_list_impl(list, nil));
+}
+
+SExp replace(char const* sym, SExp actual, SExp expanded);
+SExp replace_impl(char const* sym, SExp actual, SExp expanded, SExp result) {
+  if(null(expanded)) return result;
+  auto it = car(expanded);
+  if(symbolp(it)) {
+    if(!std::strcmp(sym, cast<Tag::Symbol>(it))) {
+      return replace_impl(sym, actual, cdr(expanded), cons(actual, result));
+    }
+    return replace_impl(sym, actual, cdr(expanded), cons(it, result));
+  }
+  if(!atomp(it)) {
+    return replace_impl(sym, actual, cdr(expanded), cons(replace(sym, actual, it), result));
+  }
+  raise(NeverComeException);
+}
+SExp replace(char const* sym, SExp actual, SExp expanded) {
+  return reverse(replace_impl(sym, actual, expanded, nil));
+}
+
+SExp expand_macro(SExp macro, SExp args) {
+  auto macro_args_ = macro_args(macro);
+  auto macro_body_ = macro_body(macro);
+  auto expanded = copy_list(macro_body_);
+  while(!null(macro_args_)) {
+    auto dummy = cast<Tag::Symbol>(car(macro_args_));
+    auto actual = car(args);
+    expanded = replace(dummy, actual, expanded);
+    macro_args_ = cdr(macro_args_);
+    args = cdr(args);
+  }
+  return expanded;
 }
 
 Env push_symbols(Env env, SExp dummies, SExp actuals) {
@@ -207,6 +269,9 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
       return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
     }
     std::tie(env, car_) = eval(env, car_);
+  }
+  if(macrop(car_)) {
+    return eval(env, expand_macro(car_, cdr_));
   }
   if(lambdap(car_)) {
     return application(env, car_, cdr_);

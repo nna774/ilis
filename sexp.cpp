@@ -68,6 +68,10 @@ bool lambdap(SExp sexp) {
   return sexp->_tag == Tag::Lambda;
 }
 
+bool macrop(SExp sexp) {
+  return sexp->_tag == Tag::Macro;
+}
+
 bool null(SExp sexp) {
   return sexp->_tag == Tag::Nil;
 }
@@ -120,6 +124,15 @@ SExp make_Lambda(Env env, SExp args, SExp body) {
   };
 }
 
+SExp make_Macro(Env env, SExp args, SExp body) {
+  Value v;
+  v.lambda = new Lambda{env, args, body}; // leak
+  return new SExp_ {
+    Tag::Macro,
+    v,
+  };
+}
+
 SExp cons(SExp car, SExp cdr) {
   Value v;
   v.pair = new Pair{ car, cdr }; // will leak
@@ -148,5 +161,14 @@ SExp args(SExp lambda) {
 }
 SExp body(SExp lambda) {
   assert(lambda->_tag == Tag::Lambda);
+  return lambda->_value.lambda->body;
+}
+
+SExp macro_args(SExp lambda) {
+  assert(lambda->_tag == Tag::Macro);
+  return lambda->_value.lambda->args;
+}
+SExp macro_body(SExp lambda) {
+  assert(lambda->_tag == Tag::Macro);
   return lambda->_value.lambda->body;
 }

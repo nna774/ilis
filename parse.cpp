@@ -159,7 +159,8 @@ std::string show(SExp sexp) {
     ss << std::string{cast<Tag::Symbol>(sexp)};
   } else if(lambdap(sexp)) {
     ss << "(lambda " << show_list(args(sexp)) << ' ' << show_list(body(sexp)) << ')';
-  } else {
+  } else if(macrop(sexp)) {
+    ss << "(defmacro )";
   }
   return ss.str();
 }
@@ -186,6 +187,8 @@ std::string show(Tag tag) {
     return "Symbol";
   case Tag::Lambda:
     return "Lambda";
+  case Tag::Macro:
+    return "Macro";
   default:
     raise(NeverComeException);
   }
