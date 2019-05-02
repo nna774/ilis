@@ -16,13 +16,6 @@ enum class Tag {
   Lambda,
 };
 
-union Value {
-  Pair* pair;
-  char const* symbol;
-  int integer;
-  Lambda* lambda;
-};
-
 SExp eq(SExp lhs, SExp rhs);
 bool to_bool(SExp);
 

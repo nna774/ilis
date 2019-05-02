@@ -3,6 +3,13 @@
 #include <cstdlib>
 #include <cstring>
 
+union Value {
+  Pair* pair;
+  char const* symbol;
+  int integer;
+  Lambda* lambda;
+};
+
 struct SExp_ {
   Tag _tag;
   Value _value;
