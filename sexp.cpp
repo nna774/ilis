@@ -1,6 +1,5 @@
 #include "sexp.hpp"
 
-#include <cstdlib>
 #include <cstring>
 
 union Value {
@@ -89,7 +88,7 @@ SExp const FALSE = make_Symbol("#f");
 char* copy_str(char const* str) {
   // 現代のコードではない。あとでGCを書く。
   size_t len = std::strlen(str);
-  char* new_str = static_cast<char*>(std::malloc(len + 1));
+  char* new_str = new char[len + 1];
   std::strcpy(new_str, str);
   return new_str;
 }
