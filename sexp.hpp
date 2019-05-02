@@ -19,12 +19,6 @@ enum class Tag {
 SExp eq(SExp lhs, SExp rhs);
 bool to_bool(SExp);
 
-struct Lambda {
-  Env env;
-  SExp args;
-  SExp body;
-};
-
 bool atomp(SExp sexp);
 bool integerp(SExp sexp);
 bool symbolp(SExp sexp);

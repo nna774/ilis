@@ -23,6 +23,12 @@ struct Pair {
   Pair(SExp car, SExp cdr) : _car{car}, _cdr{cdr} {}
 };
 
+struct Lambda {
+  Env env;
+  SExp args;
+  SExp body;
+};
+
 int cast_<Tag::Integer>::operator()(SExp const& sexp) {
   assert(sexp->_tag == Tag::Integer);
   return sexp->_value.integer;
