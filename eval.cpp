@@ -145,11 +145,14 @@ Env push_symbols(Env env, SExp dummies, SExp actuals) {
 }
 
 std::pair<Env, SExp> application(Env env_, SExp lambda, SExp args_) {
-  auto a = eval_list(env_, args_);
-  auto outer_env = a.first;
-  auto apply_args = a.second;
+  auto [outer_env, apply_args] = eval_list(env_, args_);
   Env lambda_env = expand_env(env(lambda));
-  lambda_env = push_symbols(lambda_env, args(lambda), apply_args);
+  auto lambda_args = args(lambda);
+  if(symbolp(lambda_args)) {
+    insert(lambda_env, cast<Tag::Symbol>(lambda_args), apply_args);
+  } else {
+    lambda_env = push_symbols(lambda_env, lambda_args, apply_args);
+  }
   auto body_ = body(lambda);
   auto ret = nil;
   while(!null(body_)) {
