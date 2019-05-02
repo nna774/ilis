@@ -44,6 +44,12 @@ SExp eval_eq(SExp sexp) {
   return eq(car_, cadr);
 }
 
+SExp eval_add(SExp sexp, int diff) {
+  sexp = car(sexp);
+  assert(integerp(sexp));
+  return make_Integer(cast<Tag::Integer>(sexp) + diff);
+}
+
 [[noreturn]] void fail(SExp sexp) {
   std::cerr << "*** fail *** " << show(sexp) << std::endl;
   raise(FailException);
@@ -64,6 +70,12 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   }
   if(prim == "eq") {
     return eval_eq(sexp);
+  }
+  if(prim == "inc") {
+    return eval_add(sexp, 1);
+  }
+  if(prim == "dec") {
+    return eval_add(sexp, -1);
   }
   if(prim == "fail") {
     fail(sexp);
@@ -174,7 +186,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
     raise_with_str(InvalidApplicationException, show(car_));
   }
   if(symbolp(car_)) {
-    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail");
+    auto primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec");
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
       auto l = eval_list(env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
