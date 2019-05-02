@@ -10,3 +10,10 @@
     (if (eq (sign y) 1)
       (add (inc x) (dec y))
       (add (dec x) (inc y))))))
+
+(define neg (lambda (x)
+  (if (eq x 0)
+    0
+    (if (eq (sign x) 1)
+      (dec (neg (dec x)))
+      (inc (neg (inc x)))))))
