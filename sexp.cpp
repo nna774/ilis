@@ -3,6 +3,26 @@
 #include <cstdlib>
 #include <cstring>
 
+struct SExp_ {
+  Tag _tag;
+  Value _value;
+  SExp_() : _tag{Tag::Nil}, _value{} {}
+  SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
+};
+
+int cast_<Tag::Integer>::operator()(SExp const& sexp) {
+  assert(sexp->_tag == Tag::Integer);
+  return sexp->_value.integer;
+}
+char const* cast_<Tag::Symbol>::operator()(SExp const& sexp) {
+  assert(sexp->_tag == Tag::Symbol);
+  return sexp->_value.symbol;
+}
+Lambda const* cast_<Tag::Lambda>::operator()(SExp const& sexp) {
+  assert(sexp->_tag == Tag::Lambda);
+  return sexp->_value.lambda;
+}
+
 SExp eq(SExp lhs, SExp rhs) {
   if(lhs->_tag != rhs->_tag) return FALSE;
   if(lhs->_tag == Tag::Integer) return lhs->_value.integer == rhs->_value.integer ? TRUE : FALSE;

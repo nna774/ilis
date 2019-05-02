@@ -23,13 +23,6 @@ union Value {
   Lambda* lambda;
 };
 
-struct SExp_ {
-  Tag _tag;
-  Value _value;
-  SExp_() : _tag{Tag::Nil}, _value{} {}
-  SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
-};
-
 SExp eq(SExp lhs, SExp rhs);
 bool to_bool(SExp);
 
@@ -54,32 +47,23 @@ bool null(SExp sexp);
 Tag type(SExp);
 
 template<enum Tag t>
-struct cast_{};
+struct cast_;
 
 template<>
 struct cast_<Tag::Integer> {
-  int operator()(SExp const& sexp) {
-    assert(sexp->_tag == Tag::Integer);
-    return sexp->_value.integer;
-  }
+  int operator()(SExp const& sexp);
 };
 template<>
 struct cast_<Tag::Symbol> {
-  char const* operator()(SExp const& sexp) {
-    assert(sexp->_tag == Tag::Symbol);
-    return sexp->_value.symbol;
-  }
+  char const* operator()(SExp const& sexp);
 };
 template<>
 struct cast_<Tag::Lambda> {
-  Lambda const* operator()(SExp const& sexp) {
-    assert(sexp->_tag == Tag::Lambda);
-    return sexp->_value.lambda;
-  }
+  Lambda const* operator()(SExp const& sexp);
 };
 
 template<enum Tag t>
-cast_<t> cast = cast_<t>();
+cast_<t> cast = cast_<t>{};
 
 SExp make_Symbol(char const* str);
 SExp make_Integer(int n);
