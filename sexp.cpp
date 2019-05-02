@@ -3,6 +3,36 @@
 #include <cstdlib>
 #include <cstring>
 
+union Value {
+  Pair* pair;
+  char const* symbol;
+  int integer;
+  Lambda* lambda;
+};
+
+struct SExp_ {
+  Tag _tag;
+  Value _value;
+  SExp_() : _tag{Tag::Nil}, _value{} {}
+  SExp_(Tag t, Value v) : _tag{t}, _value{v} {}
+};
+
+struct Pair {
+  SExp _car;
+  SExp _cdr;
+  Pair(SExp car, SExp cdr) : _car{car}, _cdr{cdr} {}
+};
+
+struct Lambda {
+  Env env;
+  SExp args;
+  SExp body;
+};
+
+SExp::SExp() {
+  sexp = new SExp_{};
+}
+
 int cast_<Tag::Integer>::operator()(SExp const& sexp) {
   assert(sexp->_tag == Tag::Integer);
   return sexp->_value.integer;
