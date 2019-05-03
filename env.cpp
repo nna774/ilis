@@ -28,12 +28,16 @@ public:
   }
 };
 
+Env::Env() {
+  _env = new Env_{};
+}
+
 Env empty_env() {
   return new Env_{};
 }
 
 Env expand_env(Env env) {
-  return new Env_{env};
+  return new Env_{env._env};
 }
 
 SExp lookup_symbol(Env env, std::string const& sym) {
