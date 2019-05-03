@@ -28,16 +28,33 @@ public:
   }
 };
 
+
+#include <list>
+template<typename T>
+class Allocator_ {
+  std::list<std::pair<T*, bool>> list;
+public:
+  Allocator_() {}
+
+  template<class... Args>
+  T* New(Args... args) {
+    T* t = new T{std::forward<Args>(args)...};
+    return t;
+  }
+};
+template<typename T>
+Allocator_<T> Allocator = Allocator_<T>{};
+
 Env::Env() {
-  _env = new Env_{};
+  _env = Allocator<Env_>.New();
 }
 
 Env empty_env() {
-  return new Env_{};
+  return Env{};
 }
 
 Env expand_env(Env env) {
-  return new Env_{env._env};
+  return Allocator<Env_>.New(env._env);
 }
 
 SExp lookup_symbol(Env env, std::string const& sym) {
