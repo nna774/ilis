@@ -20,19 +20,29 @@ enum class Tag {
 struct SExp_;
 
 class SExp {
-  SExp_* _sexp;
 public:
+  using element_type = SExp_;
+  using _inner_type = std::pair<bool, SExp_*>*;
   SExp();
-  SExp(SExp_ * s) : _sexp{s} {}
+  SExp(SExp const&);
+  SExp& operator=(SExp const&);
+  SExp(_inner_type);
   SExp_ const * operator->() const {
-    return _sexp;
+    assert(s != nullptr);
+    return s->second;
   }
   SExp_* operator->() {
-    return _sexp;
+    assert(s != nullptr);
+    return s->second;
   }
   bool operator==(SExp other) {
-    return _sexp == other._sexp;
+    assert(s != nullptr);
+    assert(other.s != nullptr);
+    return s->second == other.s->second;
   }
+  void mark();
+private:
+  _inner_type s;
 };
 
 SExp eq(SExp lhs, SExp rhs);

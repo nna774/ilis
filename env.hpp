@@ -1,21 +1,34 @@
 #pragma once
 
 #include <string>
+#include <cassert>
+
+#include "allocator.hpp"
 
 class SExp;
 class Env_;
 class Env {
-  Env_* _env;
 public:
+  using element_type = Env_;
+  using _inner_type = std::pair<bool, Env_*>*;
   Env();
-  Env(Env_* s) : _env{s} {}
-  friend Env expand_env(Env);
+  Env(Env const&);
+  Env& operator=(Env const&);
+  Env(_inner_type);
   Env_ const * operator->() const {
-    return _env;
+    assert(e != nullptr);
+    return e->second;
   }
   Env_* operator->() {
-    return _env;
+    assert(e != nullptr);
+    return e->second;
   }
+  operator bool() const {
+    return e != nullptr;
+  }
+  Env expand();
+private:
+  _inner_type e;
 };
 
 Env expand_env(Env env);

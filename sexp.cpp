@@ -1,4 +1,5 @@
 #include "sexp.hpp"
+#include "allocator.hpp"
 
 #include <cstring>
 
@@ -29,7 +30,22 @@ struct Lambda {
 };
 
 SExp::SExp() {
-  _sexp = new SExp_{};
+  auto ss = Allocator<SExp>.New();
+  s = ss.s;
+}
+SExp::SExp(SExp const& ss) {
+  s = ss.s;
+}
+SExp& SExp::operator=(SExp const& ss) {
+  s = ss.s;
+  return *this;
+}
+SExp::SExp(SExp::_inner_type s_) {
+  s = s_;
+}
+
+void SExp::mark() {
+  s->first = true;
 }
 
 int cast_<Tag::Integer>::operator()(SExp const& sexp) {
@@ -85,7 +101,7 @@ bool to_bool(SExp sexp) {
   return std::strcmp(sexp->_value.symbol, "#f");
 }
 
-SExp const nil = new SExp_{};
+SExp const nil{};
 SExp const TRUE = make_Symbol("#t");
 SExp const FALSE = make_Symbol("#f");
 
@@ -100,46 +116,46 @@ char* copy_str(char const* str) {
 SExp make_Symbol(char const* str) {
   Value v;
   v.symbol = copy_str(str); // leak
-  return new SExp_ {
+  return Allocator<SExp>.New(
     Tag::Symbol,
-    v,
-  };
+    v
+  );
 }
 
 SExp make_Integer(int n) {
   Value v;
   v.integer = n;
-  return new SExp_ {
+  return Allocator<SExp>.New(
     Tag::Integer,
-    v,
-  };
+    v
+  );
 }
 
 SExp make_Lambda(Env env, SExp args, SExp body) {
   Value v;
   v.lambda = new Lambda{env, args, body}; // leak
-  return new SExp_ {
+  return Allocator<SExp>.New(
     Tag::Lambda,
-    v,
-  };
+    v
+  );
 }
 
 SExp make_Macro(Env env, SExp args, SExp body) {
   Value v;
   v.lambda = new Lambda{env, args, body}; // leak
-  return new SExp_ {
+  return Allocator<SExp>.New(
     Tag::Macro,
-    v,
-  };
+    v
+  );
 }
 
 SExp cons(SExp car, SExp cdr) {
   Value v;
   v.pair = new Pair{ car, cdr }; // will leak
-  return new SExp_ {
+  return Allocator<SExp>.New(
     Tag::Pair,
-    v,
-  };
+    v
+  );
 }
 
 SExp car(SExp sexp) {

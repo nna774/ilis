@@ -6,19 +6,19 @@
 
 class Env_ {
   std::map<std::string, SExp> map;
-  Env_ const* parent;
+  Env const parent;
 public:
-  Env_() : parent{nullptr} {
+  Env_() : parent{} {
     map["#t"] = TRUE;
     map["#f"] = FALSE;
   }
-  Env_(Env_ const* p) : map{}, parent{p} {}
+  Env_(Env const p) : map{}, parent{p} {}
   SExp lookup(std::string const& sym) const {
     auto it = map.find(sym);
     if(it != end(map)) {
       return it->second;
     }
-    if(parent != nullptr) {
+    if(!!parent) {
       return parent->lookup(sym);
     }
     raise_with_str(UnboundVariableException, sym);
@@ -28,33 +28,32 @@ public:
   }
 };
 
-
-#include <list>
-template<typename T>
-class Allocator_ {
-  std::list<std::pair<T*, bool>> list;
-public:
-  Allocator_() {}
-
-  template<class... Args>
-  T* New(Args... args) {
-    T* t = new T{std::forward<Args>(args)...};
-    return t;
-  }
-};
-template<typename T>
-Allocator_<T> Allocator = Allocator_<T>{};
-
 Env::Env() {
-  _env = Allocator<Env_>.New();
+  e = nullptr;
+}
+Env::Env(Env const& env) {
+  e = env.e;
+}
+Env::Env(Env::_inner_type e_) {
+  e = e_;
+}
+Env& Env::operator=(Env const& e_) {
+  e = e_.e;
+  return *this;
+}
+
+
+
+Env Env::expand() {
+  return Allocator<Env>.New(*this);
 }
 
 Env empty_env() {
-  return Env{};
+  return Allocator<Env>.New();
 }
 
 Env expand_env(Env env) {
-  return Allocator<Env_>.New(env._env);
+  return env.expand();
 }
 
 SExp lookup_symbol(Env env, std::string const& sym) {

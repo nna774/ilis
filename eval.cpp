@@ -238,7 +238,7 @@ std::pair<Env, SExp> application(Env env_, SExp lambda, SExp args_) {
     lambda_env = push_symbols(lambda_env, lambda_args, apply_args);
   }
   auto body_ = body(lambda);
-  auto ret = nil;
+  SExp ret = nil;
   while(!null(body_)) {
     std::tie(lambda_env, ret) = eval(lambda_env, car(body_));
     body_ = cdr(body_);
@@ -286,7 +286,7 @@ SExp eval(SExp sexp) {
 }
 
 std::pair<Env, SExp> eval(Env env, std::vector<SExp> const& sexps) {
-  auto ret{nil};
+  SExp ret{nil};
   for(auto sexp: sexps) {
     std::tie(env, ret) = eval(env, sexp);
   }
