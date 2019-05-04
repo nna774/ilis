@@ -25,4 +25,7 @@ public:
 };
 
 template<typename T>
-Allocator_<T> Allocator{};
+Allocator_<T>& Allocator() {
+  static Allocator_<T> allocator{};
+  return allocator;
+}

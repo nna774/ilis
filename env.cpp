@@ -42,14 +42,12 @@ Env& Env::operator=(Env const& e_) {
   return *this;
 }
 
-
-
 Env Env::expand() {
-  return Allocator<Env>.New(*this);
+  return Allocator<Env>().New(*this);
 }
 
 Env empty_env() {
-  return Allocator<Env>.New();
+  return Allocator<Env>().New();
 }
 
 Env expand_env(Env env) {

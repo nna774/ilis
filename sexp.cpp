@@ -30,7 +30,7 @@ struct Lambda {
 };
 
 SExp::SExp() {
-  auto ss = Allocator<SExp>.New();
+  auto ss = Allocator<SExp>().New();
   s = ss.s;
 }
 SExp::SExp(SExp const& ss) {
@@ -116,7 +116,7 @@ char* copy_str(char const* str) {
 SExp make_Symbol(char const* str) {
   Value v;
   v.symbol = copy_str(str); // leak
-  return Allocator<SExp>.New(
+  return Allocator<SExp>().New(
     Tag::Symbol,
     v
   );
@@ -125,7 +125,7 @@ SExp make_Symbol(char const* str) {
 SExp make_Integer(int n) {
   Value v;
   v.integer = n;
-  return Allocator<SExp>.New(
+  return Allocator<SExp>().New(
     Tag::Integer,
     v
   );
@@ -134,7 +134,7 @@ SExp make_Integer(int n) {
 SExp make_Lambda(Env env, SExp args, SExp body) {
   Value v;
   v.lambda = new Lambda{env, args, body}; // leak
-  return Allocator<SExp>.New(
+  return Allocator<SExp>().New(
     Tag::Lambda,
     v
   );
@@ -143,7 +143,7 @@ SExp make_Lambda(Env env, SExp args, SExp body) {
 SExp make_Macro(Env env, SExp args, SExp body) {
   Value v;
   v.lambda = new Lambda{env, args, body}; // leak
-  return Allocator<SExp>.New(
+  return Allocator<SExp>().New(
     Tag::Macro,
     v
   );
@@ -152,7 +152,7 @@ SExp make_Macro(Env env, SExp args, SExp body) {
 SExp cons(SExp car, SExp cdr) {
   Value v;
   v.pair = new Pair{ car, cdr }; // will leak
-  return Allocator<SExp>.New(
+  return Allocator<SExp>().New(
     Tag::Pair,
     v
   );
