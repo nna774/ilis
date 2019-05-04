@@ -8,7 +8,10 @@
 #include <tuple>
 #include <cstring>
 
-Env const default_env = prelude();
+Env& default_env() {
+  static Env env = prelude();
+  return env;
+}
 
 std::pair<Env, SExp> eval_list(Env env, SExp sexp) {
   if(null(sexp)) return std::make_pair(env, nil);
@@ -281,7 +284,7 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
 }
 
 SExp eval(SExp sexp) {
-  auto r = eval(default_env, sexp);
+  auto r = eval(default_env(), sexp);
   return r.second;
 }
 
@@ -294,12 +297,12 @@ std::pair<Env, SExp> eval(Env env, std::vector<SExp> const& sexps) {
 }
 
 SExp eval(std::vector<SExp> const& sexps) {
-  auto r = eval(default_env, sexps);
+  auto r = eval(default_env(), sexps);
   return r.second;
 }
 
 [[noreturn]] void repl(std::istream& is) {
-  auto env = default_env;
+  auto env = default_env();
   while(true) {
     auto sexp = parse_SExpr(is);
     std::tie(env, sexp) = eval(env, sexp);
