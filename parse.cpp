@@ -158,7 +158,11 @@ std::string show(SExp sexp) {
   } else if(symbolp(sexp)) {
     ss << std::string{cast<Tag::Symbol>(sexp)};
   } else if(lambdap(sexp)) {
-    ss << "(lambda " << show_list(args(sexp)) << ' ' << show_list(body(sexp)) << ')';
+    if(atomp(args(sexp))) {
+      ss << "(lambda " << show(args(sexp)) << ' ' << show_list(body(sexp)) << ')';
+    } else {
+      ss << "(lambda " << show_list(args(sexp)) << ' ' << show_list(body(sexp)) << ')';
+    }
   } else if(macrop(sexp)) {
     ss << "(defmacro )";
   }
