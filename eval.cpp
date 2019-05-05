@@ -62,12 +62,16 @@ SExp eval_sign(SExp sexp) {
   return make_Integer(sign);
 }
 
+SExp eval_read(std::istream& is, SExp) {
+  return parse_SExpr(is);
+}
+
 [[noreturn]] void fail(SExp sexp) {
   std::cerr << "*** fail *** " << show(sexp) << std::endl;
   raise(FailException);
 }
 
-SExp eval_primitive(std::string prim, SExp sexp) {
+SExp eval_primitive(std::istream& is, std::string prim, SExp sexp) {
   if(prim == "cons") {
     return eval_cons(sexp);
   }
@@ -91,6 +95,9 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   }
   if(prim == "sign") {
     return eval_sign(sexp);
+  }
+  if(prim == "read") {
+    return eval_read(is, sexp);
   }
   if(prim == "fail") {
     fail(sexp);
@@ -249,7 +256,7 @@ std::pair<Env, SExp> application(std::istream& is, Env env_, SExp lambda, SExp a
   return std::make_pair(outer_env, ret);
 }
 
-auto const primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
+auto const primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign", "read");
 auto const specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
 
 std::pair<Env, SExp> eval(std::istream& is, Env env, SExp sexp) {
@@ -267,7 +274,7 @@ std::pair<Env, SExp> eval(std::istream& is, Env env, SExp sexp) {
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
       auto l = eval_list(is, env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
-      return std::make_pair(l.first, eval_primitive(cast<Tag::Symbol>(car_), l.second));
+      return std::make_pair(l.first, eval_primitive(is, cast<Tag::Symbol>(car_), l.second));
     }
     if(in<std::string>(cast<Tag::Symbol>(car_), specialforms)) {
       return eval_specialforms(is, cast<Tag::Symbol>(car_), env, cdr_);

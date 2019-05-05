@@ -88,6 +88,7 @@ SExp parse_List(std::istream& is) {
 }
 
 SExp parse_SExpr(std::istream& is) {
+  skip_spaces(is);
   int c_ = is.peek();
   if(c_ == EOF) {
     raise(UnexpectedEoFException);
@@ -124,7 +125,6 @@ SExp parse_SExpr(std::istream& is) {
 std::vector<SExp> parse(std::istream& is) {
   std::vector<SExp> v;
   int c;
-  skip_spaces(is);
   while(c = is.peek(), c != EOF) {
     v.push_back(parse_SExpr(is));
     skip_spaces(is);
