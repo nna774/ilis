@@ -156,7 +156,7 @@ std::string show(SExp sexp) {
   } else if(integerp(sexp)) {
     ss << cast<Tag::Integer>(sexp);
   } else if(null(sexp)) {
-    ss << "'()";
+    ss << "()";
   } else if(symbolp(sexp)) {
     ss << std::string{cast<Tag::Symbol>(sexp)};
   } else if(lambdap(sexp)) {
