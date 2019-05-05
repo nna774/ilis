@@ -2,4 +2,4 @@
 
 #include "env.hpp"
 
-Env prelude();
+Env prelude(std::istream&);

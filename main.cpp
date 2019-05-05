@@ -12,7 +12,7 @@ int main(int argc, char**) {
   auto sexps = parse(std::cin);
   std::cout << show(sexps);
   std::cout << "--------------------------------" << std::endl;
-  auto sexp = eval(sexps);
+  auto sexp = eval(std::cin, sexps);
   std::cout << show(sexp) << std::endl;
 
   return 0;

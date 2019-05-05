@@ -8,15 +8,15 @@
 #include <tuple>
 #include <cstring>
 
-Env& default_env() {
-  static Env env = prelude();
+Env& default_env(std::istream& is) {
+  static Env env = prelude(is);
   return env;
 }
 
-std::pair<Env, SExp> eval_list(Env env, SExp sexp) {
+std::pair<Env, SExp> eval_list(std::istream& is, Env env, SExp sexp) {
   if(null(sexp)) return std::make_pair(env, nil);
-  auto e = eval(env, car(sexp));
-  auto tail = eval_list(e.first, cdr(sexp));
+  auto e = eval(is, env, car(sexp));
+  auto tail = eval_list(is, e.first, cdr(sexp));
   return std::make_pair(tail.first, cons(e.second, tail.second));
 }
 
@@ -99,7 +99,7 @@ SExp eval_primitive(std::string prim, SExp sexp) {
   raise(NeverComeException);
 }
 
-std::pair<Env, SExp> eval_if(Env env, SExp sexp) {
+std::pair<Env, SExp> eval_if(std::istream& is, Env env, SExp sexp) {
   auto cond = car(sexp);
   auto true_branch = car(cdr(sexp));
   auto false_branch = car(cdr(cdr(sexp)));
@@ -107,15 +107,15 @@ std::pair<Env, SExp> eval_if(Env env, SExp sexp) {
   if(!null(cdddr)) {
     raise_with_str(IfInvalidApplicationException, show(sexp));
   }
-  std::tie(env, cond) = eval(env, cond);
+  std::tie(env, cond) = eval(is, env, cond);
   if(to_bool(eq(cond, FALSE))) {
-    return eval(env, false_branch);
+    return eval(is, env, false_branch);
   } else {
-    return eval(env, true_branch);
+    return eval(is, env, true_branch);
   }
 }
 
-std::pair<Env, SExp> eval_define(Env env, SExp sexp) {
+std::pair<Env, SExp> eval_define(std::istream& is, Env env, SExp sexp) {
   auto sym = car(sexp);
   auto val = car(cdr(sexp));
   auto cddr = cdr(cdr(sexp));
@@ -123,7 +123,7 @@ std::pair<Env, SExp> eval_define(Env env, SExp sexp) {
   if(!null(cddr)) {
     raise_with_str(DefineInvalidApplicationException, show(sexp));
   }
-  auto v = eval(env, val);
+  auto v = eval(is, env, val);
   insert(env, cast<Tag::Symbol>(sym), v.second);
   return std::make_pair(env, sym);
 }
@@ -143,12 +143,12 @@ std::pair<Env, SExp> eval_macro(Env env, SExp sexp) {
   return std::make_pair(env, sym);
 }
 
-std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
+std::pair<Env, SExp> eval_specialforms(std::istream& is, std::string form, Env env, SExp sexp) {
   if(form == "if") {
-    return eval_if(env, sexp); 
+    return eval_if(is, env, sexp);
   }
   if(form == "define") {
-    return eval_define(env, sexp);
+    return eval_define(is, env, sexp);
   }
   if(form == "lambda") {
     return eval_lambda(env, sexp);
@@ -231,8 +231,8 @@ Env push_symbols(Env env, SExp dummies, SExp actuals) {
   return push_symbols(env, cdr(dummies), cdr(actuals));
 }
 
-std::pair<Env, SExp> application(Env env_, SExp lambda, SExp args_) {
-  auto [outer_env, apply_args] = eval_list(env_, args_);
+std::pair<Env, SExp> application(std::istream& is, Env env_, SExp lambda, SExp args_) {
+  auto [outer_env, apply_args] = eval_list(is, env_, args_);
   Env lambda_env = expand_env(env(lambda));
   auto lambda_args = args(lambda);
   if(symbolp(lambda_args)) {
@@ -243,19 +243,19 @@ std::pair<Env, SExp> application(Env env_, SExp lambda, SExp args_) {
   auto body_ = body(lambda);
   SExp ret = nil;
   while(!null(body_)) {
-    std::tie(lambda_env, ret) = eval(lambda_env, car(body_));
+    std::tie(lambda_env, ret) = eval(is, lambda_env, car(body_));
     body_ = cdr(body_);
   }
   return std::make_pair(outer_env, ret);
 }
 
-std::pair<Env, SExp> eval(Env env, SExp sexp) {
+std::pair<Env, SExp> eval(std::istream& is, Env env, SExp sexp) {
   if(null(sexp) || integerp(sexp)) return std::make_pair(env, sexp);
   if(symbolp(sexp)) return std::make_pair(env, lookup_symbol(env, cast<Tag::Symbol>(sexp)));
   auto car_ = car(sexp);
   auto cdr_ = cdr(sexp);
   if(!atomp(car_)) {
-    std::tie(env, car_) = eval(env, car_);
+    std::tie(env, car_) = eval(is, env, car_);
   }
   if(!(symbolp(car_) || lambdap(car_))) {
     raise_with_str(InvalidApplicationException, show(car_));
@@ -263,49 +263,49 @@ std::pair<Env, SExp> eval(Env env, SExp sexp) {
   if(symbolp(car_)) {
     auto const primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
-      auto l = eval_list(env, cdr_);
+      auto l = eval_list(is, env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
       return std::make_pair(l.first, eval_primitive(cast<Tag::Symbol>(car_), l.second));
     }
     auto const specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
     if(in<std::string>(cast<Tag::Symbol>(car_), specialforms)) {
-      return eval_specialforms(cast<Tag::Symbol>(car_), env, cdr_);
+      return eval_specialforms(is, cast<Tag::Symbol>(car_), env, cdr_);
     }
-    std::tie(env, car_) = eval(env, car_);
+    std::tie(env, car_) = eval(is, env, car_);
   }
   if(macrop(car_)) {
-    return eval(env, expand_macro(car_, cdr_));
+    return eval(is, env, expand_macro(car_, cdr_));
   }
   if(lambdap(car_)) {
-    return application(env, car_, cdr_);
+    return application(is, env, car_, cdr_);
   }
 
   raise(NeverComeException);
 }
 
-SExp eval(SExp sexp) {
-  auto r = eval(default_env(), sexp);
+SExp eval(std::istream& is, SExp sexp) {
+  auto r = eval(is, default_env(is), sexp);
   return r.second;
 }
 
-std::pair<Env, SExp> eval(Env env, std::vector<SExp> const& sexps) {
+std::pair<Env, SExp> eval(std::istream& is, Env env, std::vector<SExp> const& sexps) {
   SExp ret{nil};
   for(auto sexp: sexps) {
-    std::tie(env, ret) = eval(env, sexp);
+    std::tie(env, ret) = eval(is, env, sexp);
   }
   return std::make_pair(env, ret);
 }
 
-SExp eval(std::vector<SExp> const& sexps) {
-  auto r = eval(default_env(), sexps);
+SExp eval(std::istream& is, std::vector<SExp> const& sexps) {
+  auto r = eval(is, default_env(is), sexps);
   return r.second;
 }
 
 [[noreturn]] void repl(std::istream& is) {
-  auto env = default_env();
+  auto env = default_env(is);
   while(true) {
     auto sexp = parse_SExpr(is);
-    std::tie(env, sexp) = eval(env, sexp);
+    std::tie(env, sexp) = eval(is, env, sexp);
     std::cout << "#=> " << show(sexp) << std::endl;
     skip_spaces(is);
   }
