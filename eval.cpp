@@ -249,6 +249,9 @@ std::pair<Env, SExp> application(std::istream& is, Env env_, SExp lambda, SExp a
   return std::make_pair(outer_env, ret);
 }
 
+auto const primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
+auto const specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
+
 std::pair<Env, SExp> eval(std::istream& is, Env env, SExp sexp) {
   if(null(sexp) || integerp(sexp)) return std::make_pair(env, sexp);
   if(symbolp(sexp)) return std::make_pair(env, lookup_symbol(env, cast<Tag::Symbol>(sexp)));
@@ -261,13 +264,11 @@ std::pair<Env, SExp> eval(std::istream& is, Env env, SExp sexp) {
     raise_with_str(InvalidApplicationException, show(car_));
   }
   if(symbolp(car_)) {
-    auto const primitives = std::experimental::make_array<std::string>("cons", "car", "cdr", "atom", "eq", "fail", "inc", "dec", "sign");
     if(in<std::string>(cast<Tag::Symbol>(car_), primitives)) {
       auto l = eval_list(is, env, cdr_);
       // eval_list で評価は終了しているので、その後envは変化しない。
       return std::make_pair(l.first, eval_primitive(cast<Tag::Symbol>(car_), l.second));
     }
-    auto const specialforms = std::experimental::make_array<std::string>("if", "define", "defmacro", "quote", "lambda");
     if(in<std::string>(cast<Tag::Symbol>(car_), specialforms)) {
       return eval_specialforms(is, cast<Tag::Symbol>(car_), env, cdr_);
     }
