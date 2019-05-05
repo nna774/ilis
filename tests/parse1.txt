@@ -1,1 +1,3 @@
 (if (null '()) #t (fail))
+
+(if (eq 'a (quote a)) #t (fail))

@@ -99,7 +99,9 @@ SExp parse_SExpr(std::istream& is) {
   case '\'': {
     return cons(
       make_Symbol("quote"),
-      parse_SExpr(is)
+      cons(
+        parse_SExpr(is),
+        nil)
     );
   }
   case '(': {

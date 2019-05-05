@@ -154,7 +154,7 @@ std::pair<Env, SExp> eval_specialforms(std::string form, Env env, SExp sexp) {
     return eval_lambda(env, sexp);
   }
   if(form == "quote") {
-    return std::make_pair(env, sexp);
+    return std::make_pair(env, car(sexp));
   }
   if(form == "defmacro") {
     return eval_macro(env, sexp);
