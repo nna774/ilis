@@ -221,9 +221,6 @@ Env push_symbols(Env env, SExp dummies, SExp actuals) {
   }
   auto dummy = car(dummies);
   auto actual = car(actuals);
-  if(null(actual)) {
-    invalid();
-  }
   if(!symbolp(dummy)) {
     invalid();
   }
