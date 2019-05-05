@@ -191,6 +191,9 @@ SExp replace_impl(char const* sym, SExp actual, SExp expanded, SExp result) {
   if(!atomp(it)) {
     return replace_impl(sym, actual, cdr(expanded), cons(replace(sym, actual, it), result));
   }
+  if(null(it)) {
+    return replace_impl(sym, actual, cdr(expanded), cons(nil, result));
+  }
   raise(NeverComeException);
 }
 SExp replace(char const* sym, SExp actual, SExp expanded) {
